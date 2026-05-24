@@ -5,7 +5,6 @@ __pycache__/
 *.pyc
 gemini_key.txt
 neon_connection.txt
-*.txt
 .DS_Store
 Thumbs.db
 *.log
