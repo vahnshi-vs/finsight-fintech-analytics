@@ -1,0 +1,10 @@
+psycopg2-binary
+pandas
+faker
+sqlalchemy
+google-generativeai
+streamlit
+jupyterlab
+numpy
+plotly
+python-dotenv
