@@ -1,0 +1,11 @@
+.env
+*.env
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+gemini_key.txt
+neon_connection.txt
+*.txt
+.DS_Store
+Thumbs.db
+*.log
