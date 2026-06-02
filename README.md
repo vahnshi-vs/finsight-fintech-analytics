@@ -155,29 +155,42 @@ The workflow of the project is one of its most important parts because FinSight 
 
 ### High-level workflow
 
-1. Generate synthetic fintech data in Python
-2. Create warehouse tables in PostgreSQL
-3. Load and validate the transaction data
-4. Build SQL views for repeated business analysis
-5. Write analytical SQL queries for key business questions
-6. Connect the warehouse to Power BI
-7. Build the multi-page dashboard
-8. Add a Streamlit-based AI query layer
-9. Document insights, limitations, and performance evidence
-10. Package the project for GitHub and portfolio presentation
+flowchart TD
+    A[Generate synthetic fintech data in Python]
+    B[Create warehouse tables in PostgreSQL]
+    C[Load and validate transaction data]
+    D[Build SQL views for repeated business analysis]
+    E[Write analytical SQL queries for key business questions]
+    F[Connect the warehouse to Power BI]
+    G[Build the multi-page dashboard]
+    H[Add a Streamlit-based AI query layer]
+    I[Document insights, limitations, and performance evidence]
+    J[Package the project for GitHub and portfolio presentation]
 
+    A --> B --> C --> D --> E --> F --> G --> H --> I --> J
 ---
 
 ## Process Diagram
 
 The business process behind the project can be understood like this:
 
-Business questions  
-→ transaction warehouse design  
-→ PostgreSQL tables  
-→ SQL views  
-→ SQL analysis + Power BI dashboard + AI query layer  
-→ business insights
+flowchart LR
+    A[Business questions]
+    B[Warehouse design]
+    C[Fact and dimension tables]
+    D[Analytical views]
+    E[SQL analysis]
+    F[Power BI dashboards]
+    G[AI-assisted querying]
+    H[Business insights]
+
+    A --> B --> C --> D
+    D --> E
+    D --> F
+    D --> G
+    E --> H
+    F --> H
+    G --> H
 
 If you create a dedicated workflow or process image later, place it in `docs/` and link it here.
 
