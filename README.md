@@ -105,30 +105,20 @@ This project runs in a local analytics environment.
 
 ## Tech Stack
 
-### Data and warehouse
-- PostgreSQL
-- pgAdmin
-- SQL
-
-### Data generation and analysis
-- Python
-- JupyterLab
-- Faker
-
-### Reporting and BI
-- Power BI Desktop
-
-### AI layer
-- Streamlit
-- Google Gemini API
-- `google-genai`
-- `python-dotenv`
-
-### Documentation and versioning
-- Markdown
-- Git
-- GitHub
-
+| Layer | Technology | Purpose |
+|---|---|---|
+| Database | PostgreSQL | Star schema data warehouse in fintech schema |
+| Database Management | pgAdmin | SQL development, schema creation, query testing |
+| Data Generation | Python, Faker, NumPy | Synthetic fintech transaction data with 14 engineered conditions |
+| Data Loading | Pandas, SQLAlchemy, psycopg2 | Loading dimension and fact tables into PostgreSQL |
+| SQL Analysis | PostgreSQL SQL | 17 analytical queries across revenue, fraud, customers, merchants, declines |
+| Visualisation | Plotly | Optional charts in Streamlit interface |
+| BI Reporting | Power BI Desktop and Power BI Service | Four-page executive dashboard with DAX measures |
+| AI Layer | Streamlit, Google Gemini API | Natural language query interface with SQL validation |
+| Gemini SDK | google-genai | Current Google AI Python SDK using gemini-2.0-flash model |
+| Credential Management | python-dotenv | Secure local credential loading from .env file |
+| Development Environment | JupyterLab | Notebooks, SQL testing, file creation |
+| Version Control | Git and GitHub | Repository management and portfolio hosting |
 ---
 
 ## Architecture
@@ -335,7 +325,10 @@ FinSight also includes a Streamlit-based natural language BI prototype that was 
 A Streamlit-based natural language BI interface was developed for this project.  
 Screenshots are included below to demonstrate the workflow and interface.
 
-This app is currently presented as a local prototype rather than a public deployment because it depends on secure credentials and a local PostgreSQL workflow.
+This app is fully built and runs locally. Deployment to Streamlit Cloud 
+is in progress. The complete source code is in ai-layer/app.py. 
+To run it locally, clone the repository, add your credentials to 
+a .env file following .env.example, and run: streamlit run ai-layer/app.py
 
 ### What this layer demonstrates
 
@@ -522,7 +515,7 @@ pip install -r requirements.txt
 
 ### 5. Configure environment variables
 
-Create a `.env` file in the project root and add:
+Open the .env file and replace the placeholder values with your actual credentials:
 
 ```env
 DATABASE_URL_LOCAL=your_postgresql_connection_string
