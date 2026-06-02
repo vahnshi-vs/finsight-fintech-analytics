@@ -1,6 +1,9 @@
 # FinSight
 ### Fintech Transaction Analytics Warehouse with Natural Language BI
 
+## Live Demo: https://www.loom.com/share/c1e346fb640f40858677304dffaae75e
+
+
 FinSight is an end-to-end fintech analytics portfolio project built around an Indian digital payments business use case. It combines PostgreSQL warehouse design, analytical SQL, Power BI reporting, and an AI-assisted query interface to show how transaction data can be transformed into business insight.
 
 This project was built to answer the kind of recurring questions a payments business would actually care about: revenue movement, payment method performance, fraud patterns, customer value, merchant contribution, geography-based trends, and failed transaction behavior.
