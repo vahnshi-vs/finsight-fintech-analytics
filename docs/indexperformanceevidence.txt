@@ -1,0 +1,115 @@
+FinSight Index Performance Evidence
+Project Name: FinSight
+Database: finsight_analytics
+Schema: fintech
+
+Purpose
+-------
+This file records index-aware performance verification notes for the FinSight PostgreSQL warehouse.
+
+It is included to show that query performance was considered during the project and that verification was done using PostgreSQL execution-plan inspection. It is not meant to claim enterprise-scale benchmarking.
+
+Scope note
+----------
+The FinSight dataset is portfolio-scale and synthetic. Because of that, performance observations should be interpreted within the scale of this project.
+
+For smaller datasets, PostgreSQL may correctly choose a sequential scan even when an index exists. That is not automatically a problem. The objective here is to verify whether indexing exists on important access paths and whether the planner behavior is sensible.
+
+Core tables involved
+--------------------
+- fintech.dim_customer
+- fintech.dim_geography
+- fintech.dim_merchant
+- fintech.dim_payment_method
+- fintech.dim_time
+- fintech.fact_transactions
+
+Important join and filter columns
+---------------------------------
+Join paths commonly used in analysis:
+- fact_transactions.date_key -> dim_time.date_key
+- fact_transactions.customer_id -> dim_customer.customer_id
+- fact_transactions.merchant_id -> dim_merchant.merchant_id
+- fact_transactions.payment_method_id -> dim_payment_method.payment_method_id
+- fact_transactions.geography_id -> dim_geography.geography_id
+
+Filter-heavy columns commonly used in analysis:
+- fact_transactions.status
+- fact_transactions.is_fraud
+- fact_transactions.transaction_hour
+- fact_transactions.decline_category
+- fact_transactions.decline_reason
+
+Suggested EXPLAIN ANALYZE checks
+--------------------------------
+
+1. Monthly trend and KPI query
+
+EXPLAIN ANALYZE
+SELECT
+    dt.year,
+    dt.month,
+    SUM(ft.transaction_amount) AS total_transaction_amount,
+    SUM(ft.fee_amount) AS total_fee_amount,
+    SUM(ft.net_amount) AS total_net_amount
+FROM fintech.fact_transactions ft
+JOIN fintech.dim_time dt
+    ON ft.date_key = dt.date_key
+GROUP BY dt.year, dt.month
+ORDER BY dt.year, dt.month;
+
+2. Fraud by geography query
+
+EXPLAIN ANALYZE
+SELECT
+    dg.state_name,
+    COUNT(*) AS fraud_transaction_count,
+    SUM(ft.transaction_amount) AS fraud_transaction_amount
+FROM fintech.fact_transactions ft
+JOIN fintech.dim_geography dg
+    ON ft.geography_id = dg.geography_id
+WHERE ft.is_fraud = TRUE
+GROUP BY dg.state_name
+ORDER BY fraud_transaction_amount DESC;
+
+3. Failed transaction decline query
+
+EXPLAIN ANALYZE
+SELECT
+    ft.decline_category,
+    ft.decline_reason,
+    COUNT(*) AS decline_count
+FROM fintech.fact_transactions ft
+WHERE ft.status = 'Failed'
+GROUP BY ft.decline_category, ft.decline_reason
+ORDER BY decline_count DESC;
+
+What to review in the output
+----------------------------
+When checking the EXPLAIN ANALYZE output, review the following:
+
+- Whether the join paths behave efficiently
+- Whether PostgreSQL uses index scans, bitmap index scans, or sensible join strategies where appropriate
+- Whether unexpected full sequential scans appear on large access paths
+- Whether filters such as is_fraud or status are causing avoidable heavy scans
+- Whether execution time is reasonable for the current project scale
+
+Interpretation guidance
+-----------------------
+A sequential scan is not always a mistake.
+
+PostgreSQL chooses plans based on cost estimates. For a relatively small dataset, a sequential scan may still be the correct and faster choice. The goal is not to force index usage everywhere. The goal is to verify that the indexing strategy is thoughtful and that the planner output is reasonable for the workload.
+
+Actual evidence section
+-----------------------
+Paste the actual EXPLAIN ANALYZE output below after running the queries in pgAdmin.
+
+[PASTE MONTHLY KPI QUERY PLAN HERE]
+
+[PASTE FRAUD BY GEOGRAPHY QUERY PLAN HERE]
+
+[PASTE FAILED TRANSACTION DECLINE QUERY PLAN HERE]
+
+Final note
+----------
+Before final GitHub polish, this file should contain real query-plan output from the current local PostgreSQL environment instead of placeholders only.

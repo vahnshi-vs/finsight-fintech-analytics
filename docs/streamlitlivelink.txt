@@ -1,0 +1,10 @@
+FinSight Streamlit Live Link
+
+Current status:
+No public Streamlit deployment link is available yet.
+
+Note:
+The AI layer exists locally in:
+ai-layer/app.py
+
+If a public deployment is created later, replace this file content with the final live URL.

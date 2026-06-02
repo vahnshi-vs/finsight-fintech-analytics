@@ -1,0 +1,8 @@
+FinSight Power BI Demo Link
+
+Loom walkthrough:
+https://www.loom.com/share/5cbcb307638a4ce9aa88fdd5a186f662
+
+Note:
+This project uses a Loom walkthrough link as the public-facing Power BI demo asset.
+A direct Power BI Service public link is not used in this project workflow.
