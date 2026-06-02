@@ -1,12 +1,13 @@
 # ============================================================
-# FinSight AI Layer — app.py
+# FinSight AI Layer - app.py
 # Phase 7: Natural Language Business Intelligence
-# PostgreSQL + Google Gemini 2.0 Flash + Streamlit
+# PostgreSQL + Google Gemini 2.5 Flash + Streamlit
 # ============================================================
 
 import os
 import re
 import time
+import html
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
@@ -17,17 +18,12 @@ from sqlalchemy.exc import SQLAlchemyError
 load_dotenv()
 
 
-# ── secret loader ────────────────────────────────────────────
-# Works for both local .env and Streamlit Cloud secrets
-
 def getsecret(key: str, default: str | None = None) -> str | None:
     try:
         return st.secrets[key]
     except (KeyError, FileNotFoundError, AttributeError):
         return os.environ.get(key, default)
 
-
-# ── page configuration ───────────────────────────────────────
 
 st.set_page_config(
     page_title="FinSight AI",
@@ -36,14 +32,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-
-# ── global CSS ───────────────────────────────────────────────
-
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
 
 [data-testid="stAppViewContainer"] {
     background:
@@ -52,17 +47,37 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
         linear-gradient(180deg, #07111f 0%, #0b1220 45%, #0f172a 100%);
     color: #f8fafc;
 }
-[data-testid="stHeader"] { background: rgba(0,0,0,0); }
+
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
+}
+
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0b1220 0%, #111827 100%);
     border-right: 1px solid rgba(255,255,255,0.06);
 }
+
 .block-container {
     max-width: 1240px;
     padding-top: 1.8rem;
     padding-bottom: 2rem;
 }
-h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
+
+html, body, [data-testid="stAppViewContainer"] {
+    color: #f8fafc;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #f8fafc;
+}
+
+p, label {
+    color: #cbd5e1;
+}
+
+pre, code {
+    color: #111827 !important;
+}
 
 .hero-wrap {
     padding: 2rem;
@@ -72,6 +87,7 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     box-shadow: 0 16px 40px rgba(0,0,0,0.30);
     margin-bottom: 1.25rem;
 }
+
 .hero-badge {
     display: inline-block;
     padding: 0.45rem 0.8rem;
@@ -83,6 +99,7 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     font-weight: 600;
     margin-bottom: 0.9rem;
 }
+
 .hero-title {
     font-size: 2.3rem;
     font-weight: 800;
@@ -90,6 +107,7 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     margin-bottom: 0.75rem;
     letter-spacing: -0.02em;
 }
+
 .hero-subtitle {
     color: #cbd5e1;
     font-size: 1.02rem;
@@ -103,7 +121,11 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     padding: 1rem;
     box-shadow: 0 10px 26px rgba(0,0,0,0.18);
 }
-.metric-card { min-height: 132px; }
+
+.metric-card {
+    min-height: 132px;
+}
+
 .metric-label {
     font-size: 0.84rem;
     color: #93c5fd;
@@ -112,11 +134,13 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
+
 .metric-text {
     color: #e5e7eb;
     font-size: 0.97rem;
     line-height: 1.6;
 }
+
 .section-title {
     font-size: 1.15rem;
     font-weight: 700;
@@ -132,6 +156,7 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     margin: 0.9rem 0 1rem;
     font-weight: 500;
 }
+
 .status-warning {
     padding: 0.85rem 1rem;
     border-radius: 14px;
@@ -141,6 +166,7 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     margin-top: 0.9rem;
     font-weight: 500;
 }
+
 .status-error {
     padding: 0.85rem 1rem;
     border-radius: 14px;
@@ -150,6 +176,7 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     margin-top: 0.9rem;
     font-weight: 500;
 }
+
 .small-note {
     color: #94a3b8;
     font-size: 0.88rem;
@@ -166,6 +193,7 @@ h1, h2, h3, h4, h5, h6, p, label, div, span { color: #f8fafc; }
     font-size: 0.88rem;
     color: #cbd5e1;
 }
+
 .hist-rows {
     color: #64748b;
     font-size: 0.78rem;
@@ -180,11 +208,15 @@ div[data-testid="stTextArea"] textarea {
     border: 1px solid rgba(255,255,255,0.12) !important;
     font-size: 0.97rem !important;
 }
+
 div[data-testid="stTextArea"] textarea::placeholder {
     color: #64748b !important;
     opacity: 1 !important;
 }
-div[data-testid="stTextArea"] label { color: #cbd5e1 !important; }
+
+div[data-testid="stTextArea"] label {
+    color: #cbd5e1 !important;
+}
 
 div.stButton > button {
     width: 100%;
@@ -197,7 +229,10 @@ div.stButton > button {
     box-shadow: 0 10px 24px rgba(14,165,233,0.22);
     transition: filter 0.15s;
 }
-div.stButton > button:hover { filter: brightness(1.06); }
+
+div.stButton > button:hover {
+    filter: brightness(1.06);
+}
 
 [data-testid="stSidebar"] div.stButton > button {
     background: rgba(14,165,233,0.10) !important;
@@ -209,11 +244,27 @@ div.stButton > button:hover { filter: brightness(1.06); }
     font-size: 0.90rem !important;
     text-align: left !important;
 }
+
+[data-testid="stMetricLabel"] {
+    color: #cbd5e1 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #f8fafc !important;
+}
+
+[data-testid="stAlert"] {
+    background-color: rgba(15, 23, 42, 0.75) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+[data-testid="stAlert"] * {
+    color: #e2e8f0 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
-
-
-# ── credentials ──────────────────────────────────────────────
 
 GEMINI_API_KEY = getsecret("GEMINI_API_KEY")
 DATABASE_URL = getsecret("DATABASE_URL_LOCAL")
@@ -225,9 +276,6 @@ if not GEMINI_API_KEY:
 if not DATABASE_URL:
     st.error("Missing DATABASE_URL_LOCAL. Add it to your .env file.")
     st.stop()
-
-
-# ── client initialisation ────────────────────────────────────
 
 try:
     gemini_client = genai.Client(api_key=GEMINI_API_KEY)
@@ -247,11 +295,7 @@ except Exception as db_error:
     st.error(f"PostgreSQL connection failed: {db_error}")
     st.stop()
 
-GEMINI_MODEL = "gemini-2.0-flash"
-
-
-# ── schema context ───────────────────────────────────────────
-# Uses ONLY the user-confirmed current FinSight names
+GEMINI_MODEL = "gemini-2.5-flash"
 
 SCHEMA_CONTEXT = """
 You are a PostgreSQL SQL expert for FinSight, a fintech transaction analytics project.
@@ -264,9 +308,25 @@ CRITICAL RULES:
 5. No markdown, no backticks, no explanation, SQL only.
 6. Never generate INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, GRANT, REVOKE, or EXEC.
 7. Use NULLIF() in denominators where division happens.
-8. Use ROUND(..., 2) for percentages and financial ratios when appropriate.
+8. Use ROUND(..., 2) for percentages, ratios, and aggregate monetary outputs.
 9. Prefer the base tables unless a listed view directly fits the question.
-10. If the business question mentions fraud, declines, payment methods, customer segments, merchants, geography, or time trends, use the exact matching fields below.
+10. Always use business-friendly column aliases for final output.
+11. Never return unnamed aggregate columns like SUM(...), AVG(...), COUNT(...).
+12. If the user asks for total revenue, interpret revenue as SUM(ft.net_amount) for successful transactions only.
+13. For single-value outputs, return exactly one clearly named column.
+14. Use aliases like total_revenue, fraud_rate_pct, failed_txn_count, avg_processing_time_seconds, customer_segment_revenue.
+
+OUTPUT STYLE RULES:
+- Always alias aggregate columns with clear business names.
+- Monetary outputs must use ROUND(..., 2).
+- Percentage outputs must use ROUND(..., 2).
+- If the question asks for total revenue, use:
+  ROUND(SUM(ft.net_amount)::numeric, 2) AS total_revenue
+  and filter WHERE ft.status = 'success'
+- If the question asks for total transaction count, use:
+  COUNT(*) AS total_transactions
+- If the question asks for fraud rate, use:
+  ROUND(SUM(CASE WHEN ft.is_fraud = TRUE THEN 1 ELSE 0 END)::numeric / NULLIF(COUNT(*), 0) * 100, 2) AS fraud_rate_pct
 
 CORE TABLES:
 
@@ -395,9 +455,6 @@ ALWAYS:
 - For geography analysis, join dim_geography.
 """
 
-
-# ── constants ────────────────────────────────────────────────
-
 EXAMPLE_QUESTIONS: list[str] = [
     "Which payment method had the highest fraud rate?",
     "What percentage of UPI failed transaction value looks technically recoverable?",
@@ -412,13 +469,7 @@ BLOCKED_SQL_KEYWORDS: list[str] = [
 ]
 
 
-# ── gemini wrapper ───────────────────────────────────────────
-
 def call_gemini(prompt: str, max_retries: int = 2, base_wait: int = 2) -> str:
-    """
-    Calls Gemini with retry for temporary service issues.
-    Stops immediately for quota or rate-limit errors.
-    """
     wait = base_wait
     last_error: Exception | None = None
 
@@ -429,14 +480,13 @@ def call_gemini(prompt: str, max_retries: int = 2, base_wait: int = 2) -> str:
                 contents=prompt,
             )
             return (response.text or "").strip()
-
         except Exception as api_error:
             err_str = str(api_error)
 
             if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
                 raise RuntimeError(
-                    "Gemini API quota is currently exhausted. "
-                    "Please retry later. The SQL and Power BI layers of FinSight still remain usable."
+                    "Gemini API quota is currently exhausted. Please retry later. "
+                    "The SQL and Power BI layers of FinSight still remain usable."
                 ) from api_error
 
             if ("503" in err_str or "UNAVAILABLE" in err_str) and attempt < max_retries:
@@ -489,7 +539,13 @@ def generate_sql_query(user_question: str) -> str:
     prompt = (
         f"{SCHEMA_CONTEXT}\n\n"
         f"Business question: {user_question}\n\n"
-        "Return only one valid PostgreSQL SELECT query. "
+        "Return only one valid PostgreSQL SELECT query.\n"
+        "The SQL must:\n"
+        "- use only the listed schema objects,\n"
+        "- use clear business-friendly aliases,\n"
+        "- round monetary and percentage outputs to 2 decimals,\n"
+        "- avoid unnamed aggregates,\n"
+        "- and if the question is about total revenue, return total_revenue using successful net_amount.\n"
         "No markdown. No explanation. SQL only."
     )
     raw_output = call_gemini(prompt)
@@ -502,8 +558,11 @@ def fix_sql_query(user_question: str, failed_sql: str, error_msg: str) -> str:
         f"Business question: {user_question}\n\n"
         f"The following SQL query failed:\n{failed_sql}\n\n"
         f"Database error message: {error_msg}\n\n"
-        "Fix the SQL using only the listed schema names. "
-        "Return only the corrected PostgreSQL SELECT query. "
+        "Fix the SQL using only the listed schema names.\n"
+        "Preserve business-friendly aliases.\n"
+        "Round monetary and percentage outputs to 2 decimals.\n"
+        "Do not return unnamed aggregate columns.\n"
+        "Return only the corrected PostgreSQL SELECT query.\n"
         "No markdown. No explanation. SQL only."
     )
     raw_output = call_gemini(prompt)
@@ -515,15 +574,49 @@ def run_sql_query(sql_text: str) -> pd.DataFrame:
         return pd.read_sql_query(text(sql_text), conn)
 
 
+def prettify_result_df(user_question: str, result_df: pd.DataFrame) -> pd.DataFrame:
+    df = result_df.copy()
+
+    if df.empty:
+        return df
+
+    rename_map = {
+        "sum": "total_revenue",
+        "avg": "average_value",
+        "count": "total_count",
+        "max": "maximum_value",
+        "min": "minimum_value",
+    }
+
+    df.columns = [rename_map.get(str(col).lower(), col) for col in df.columns]
+
+    numeric_cols = df.select_dtypes(include="number").columns
+    if len(numeric_cols) > 0:
+        df[numeric_cols] = df[numeric_cols].round(2)
+
+    return df
+
+
 def generate_local_narrative(user_question: str, result_df: pd.DataFrame) -> str:
-    """
-    Local fallback summary to reduce Gemini dependency.
-    This avoids spending one more API call after SQL execution.
-    """
     if result_df.empty:
         return (
             "The query ran successfully but returned no rows. "
             "Try broadening the question or changing the time scope."
+        )
+
+    if result_df.shape == (1, 1):
+        col_name = str(result_df.columns[0]).replace("_", " ").title()
+        value = result_df.iloc[0, 0]
+        if isinstance(value, (int, float)):
+            return (
+                f"Question asked: {user_question}\n\n"
+                f"The query returned a single business metric.\n\n"
+                f"{col_name}: {value:,.2f}"
+            )
+        return (
+            f"Question asked: {user_question}\n\n"
+            f"The query returned a single business metric.\n\n"
+            f"{col_name}: {value}"
         )
 
     row_count = len(result_df)
@@ -549,7 +642,52 @@ def generate_local_narrative(user_question: str, result_df: pd.DataFrame) -> str
     )
 
 
-# ── session state ────────────────────────────────────────────
+def get_rule_based_sql(user_question: str) -> str | None:
+    q = user_question.strip().lower()
+
+    if q in {
+        "what is the total revenue?",
+        "what is the total revenue",
+        "total revenue",
+        "show total revenue",
+    }:
+        return """
+SELECT ROUND(SUM(ft.net_amount)::numeric, 2) AS total_revenue
+FROM fintech.fact_transactions ft
+WHERE ft.status = 'success'
+""".strip()
+
+    return None
+
+
+def render_sql_box(sql_text: str) -> None:
+    safe_sql = html.escape(sql_text)
+    st.markdown(
+        f"""
+        <div style="
+            background:#0f172a;
+            color:#e5e7eb;
+            border:1px solid rgba(255,255,255,0.10);
+            border-radius:14px;
+            padding:1rem;
+            overflow-x:auto;
+            font-family:Consolas, 'Courier New', monospace;
+            font-size:0.92rem;
+            line-height:1.65;
+            white-space:pre-wrap;
+        ">
+            <pre style="
+                margin:0;
+                background:#0f172a;
+                color:#e5e7eb;
+                white-space:pre-wrap;
+                word-break:break-word;
+            ">{safe_sql}</pre>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 if "question_history" not in st.session_state:
     st.session_state.question_history = []
@@ -557,8 +695,8 @@ if "question_history" not in st.session_state:
 if "prefill_question" not in st.session_state:
     st.session_state.prefill_question = ""
 
-
-# ── sidebar ──────────────────────────────────────────────────
+if "user_question" not in st.session_state:
+    st.session_state.user_question = ""
 
 with st.sidebar:
     st.markdown("## 💹 FinSight")
@@ -599,7 +737,7 @@ with st.sidebar:
         recent_items = list(reversed(st.session_state.question_history[-5:]))
         for hist_item in recent_items:
             truncated = (
-                hist_item["question"][:52] + "…"
+                hist_item["question"][:52] + "..."
                 if len(hist_item["question"]) > 52
                 else hist_item["question"]
             )
@@ -616,9 +754,6 @@ with st.sidebar:
     st.caption(f"Model: {GEMINI_MODEL}")
     st.caption("DB: PostgreSQL / fintech schema")
     st.caption("Records: 50,000 transactions")
-
-
-# ── hero section ─────────────────────────────────────────────
 
 st.markdown(f"""
 <div class="hero-wrap">
@@ -641,9 +776,6 @@ st.markdown(
     f"</div>",
     unsafe_allow_html=True,
 )
-
-
-# ── metric cards ─────────────────────────────────────────────
 
 mc1, mc2, mc3 = st.columns(3)
 
@@ -674,21 +806,14 @@ with mc3:
     <div class="metric-card">
         <div class="metric-label">Workflow</div>
         <div class="metric-text">
-            Question → SQL generation → safety validation →
-            PostgreSQL execution → retry on error → output summary.
+            Question -> SQL generation -> safety validation -> PostgreSQL execution -> retry on error -> output summary.
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 st.write("")
 
-
-# ── main two-column layout ──────────────────────────────────
-
 left_col, right_col = st.columns([1.7, 1])
-
-
-# ── left column ─────────────────────────────────────────────
 
 with left_col:
     st.markdown('<div class="question-panel">', unsafe_allow_html=True)
@@ -697,15 +822,16 @@ with left_col:
         unsafe_allow_html=True,
     )
 
+    if st.session_state.prefill_question:
+        st.session_state.user_question = st.session_state.prefill_question
+        st.session_state.prefill_question = ""
+
     user_question = st.text_area(
         label="Enter your question",
-        value=st.session_state.prefill_question,
+        key="user_question",
         placeholder="Example: Which payment method had the highest fraud rate last month?",
         height=150,
     )
-
-    if st.session_state.prefill_question:
-        st.session_state.prefill_question = ""
 
     submitted = st.button("🔍 Generate AI Response")
 
@@ -723,7 +849,7 @@ with left_col:
 
             try:
                 with st.spinner("Generating SQL query..."):
-                    generated_sql = generate_sql_query(question_text)
+                    generated_sql = get_rule_based_sql(question_text) or generate_sql_query(question_text)
 
                 is_safe, safety_reason = is_sql_safe(generated_sql)
 
@@ -735,9 +861,8 @@ with left_col:
                 else:
                     try:
                         with st.spinner("Running SQL on PostgreSQL..."):
-                            result_df = run_sql_query(generated_sql)
+                            result_df = prettify_result_df(question_text, run_sql_query(generated_sql))
                         executed_sql = generated_sql
-
                     except (SQLAlchemyError, Exception) as first_error:
                         first_error_msg = str(first_error)
 
@@ -775,7 +900,7 @@ with left_col:
                             else:
                                 try:
                                     with st.spinner("Running corrected SQL..."):
-                                        result_df = run_sql_query(corrected_sql)
+                                        result_df = prettify_result_df(question_text, run_sql_query(corrected_sql))
                                     executed_sql = corrected_sql
                                 except Exception as second_error:
                                     st.markdown(
@@ -785,26 +910,38 @@ with left_col:
 
                     if executed_sql:
                         with st.expander("🔎 View Generated SQL", expanded=False):
-                            st.code(executed_sql, language="sql")
+                            render_sql_box(executed_sql)
                             st.caption("Generated by Gemini and validated before execution.")
 
                     if result_df is not None:
                         st.markdown("### 📊 Query Results")
-                        st.dataframe(
-                            result_df,
-                            use_container_width=True,
-                            hide_index=True,
-                        )
+
+                        if result_df.shape == (1, 1):
+                            metric_label = str(result_df.columns[0]).replace("_", " ").title()
+                            metric_value = result_df.iloc[0, 0]
+                            if isinstance(metric_value, (int, float)):
+                                st.metric(metric_label, f"{metric_value:,.2f}")
+                            else:
+                                st.metric(metric_label, str(metric_value))
+                        else:
+                            st.dataframe(
+                                result_df,
+                                use_container_width=True,
+                                hide_index=True,
+                            )
+
                         st.caption(f"↳ {len(result_df)} row(s) returned from PostgreSQL")
 
                         st.markdown("### 💡 Business Insight")
                         st.info(generate_local_narrative(question_text, result_df))
 
-                        st.session_state.question_history.append({
-                            "question": question_text,
-                            "sql": executed_sql or "",
-                            "row_count": len(result_df),
-                        })
+                        st.session_state.question_history.append(
+                            {
+                                "question": question_text,
+                                "sql": executed_sql or "",
+                                "row_count": len(result_df),
+                            }
+                        )
 
             except RuntimeError as runtime_err:
                 err_msg = str(runtime_err)
@@ -829,9 +966,6 @@ with left_col:
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# ── right column ─────────────────────────────────────────────
-
 with right_col:
     st.markdown('<div class="panel">', unsafe_allow_html=True)
     st.markdown(
@@ -853,9 +987,6 @@ with right_col:
         unsafe_allow_html=True,
     )
     st.markdown("</div>", unsafe_allow_html=True)
-
-
-# ── footer ───────────────────────────────────────────────────
 
 st.markdown("---")
 st.caption(
