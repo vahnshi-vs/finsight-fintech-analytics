@@ -385,6 +385,7 @@ finsight-fintech-analytics/
 │   └── app.py
 │
 ├── docs/
+│   ├── architecture_diagram.png
 │   ├── datadictionary.md
 │   ├── indexperformanceevidence.txt
 │   ├── powerbilivelink.txt
@@ -621,70 +622,6 @@ Possible future improvements for FinSight include:
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-## Beginner Notes for Adding Links and Images
-
-As a beginner, use these simple rules:
-
-### 1. How to add an internal file link
-
-If the file is inside your repository, use a relative path.
-
-Example:
-
-```md
-[Project story](docs/story.md)
-```
-
-### 2. How to add an image
-
-If an image file is saved in `docs/`, use:
-
-```md
-
-```
-
-### 3. How to add a video link
-
-For a Loom link, use:
-
-```md
-[Watch the FinSight demo video](https://www.loom.com/share/5cbcb307638a4ce9aa88fdd5a186f662)
-```
-
-### 4. Where to keep screenshots
-
-Save your Power BI screenshots inside `docs/` with clean names like:
-
-- `powerbi-executive-overview.png`
-- `powerbi-customer-segment.png`
-- `powerbi-risk-fraud-decline.png`
-- `powerbi-merchant-operations.png`
-
-Then add them in the README using:
-
-```md
-
-```
-
-### 5. Where to keep links
-
-For text links you want to save in the repo, use small `.txt` files in `docs/`, such as:
-
-- `docs/powerbilivelink.txt`
-- `docs/streamlitlivelink.txt`
-
-### 6. How to avoid mistakes
-
-Before pushing to GitHub:
-
-- Check that every file name matches exactly
-- Check that every image path opens correctly
-- Check that every markdown link works
-- Do not leave placeholders if the actual file is ready
-- Do not commit `.env`
 
 ---
 
