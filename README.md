@@ -155,42 +155,35 @@ The workflow of the project is one of its most important parts because FinSight 
 
 ### High-level workflow
 
+```mermaid
 flowchart TD
-    A[Generate synthetic fintech data in Python]
-    B[Create warehouse tables in PostgreSQL]
-    C[Load and validate transaction data]
-    D[Build SQL views for repeated business analysis]
-    E[Write analytical SQL queries for key business questions]
-    F[Connect the warehouse to Power BI]
-    G[Build the multi-page dashboard]
-    H[Add a Streamlit-based AI query layer]
-    I[Document insights, limitations, and performance evidence]
-    J[Package the project for GitHub and portfolio presentation]
-
-    A --> B --> C --> D --> E --> F --> G --> H --> I --> J
----
+    A[Generate synthetic fintech data in Python] --> B[Create warehouse tables in PostgreSQL]
+    B --> C[Load and validate transaction data]
+    C --> D[Build SQL views for repeated business analysis]
+    D --> E[Write analytical SQL queries]
+    E --> F[Connect warehouse to Power BI]
+    F --> G[Build multi-page dashboard]
+    G --> H[Add Streamlit AI query layer]
+    H --> I[Document insights and limitations]
+    I --> J[Package project for GitHub]
+```
 
 ## Process Diagram
 
 The business process behind the project can be understood like this:
 
+```mermaid
 flowchart LR
-    A[Business questions]
-    B[Warehouse design]
-    C[Fact and dimension tables]
-    D[Analytical views]
-    E[SQL analysis]
-    F[Power BI dashboards]
-    G[AI-assisted querying]
-    H[Business insights]
-
-    A --> B --> C --> D
-    D --> E
-    D --> F
-    D --> G
-    E --> H
+    A[Business questions] --> B[Warehouse design]
+    B --> C[PostgreSQL tables]
+    C --> D[SQL views]
+    D --> E[SQL analysis]
+    D --> F[Power BI dashboard]
+    D --> G[AI query layer]
+    E --> H[Business insights]
     F --> H
     G --> H
+```
 
 If you create a dedicated workflow or process image later, place it in `docs/` and link it here.
 
