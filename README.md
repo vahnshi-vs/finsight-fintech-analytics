@@ -220,6 +220,8 @@ FinSight uses a star-schema structure to support reporting and analysis.
 ### Star schema diagram
 
 ![FinSight Star Schema](docs/starschemadiagram.png)
+<img width="1344" height="1041" alt="starschemadiagram" src="https://github.com/user-attachments/assets/1d138fbb-f4e1-46f1-a5a2-9ed301c0b372" />
+
 
 ---
 
@@ -311,9 +313,17 @@ Add your Power BI screenshots here once the image files are saved inside the rep
 
 Example image file names:
 - `docs/powerbi-executive-overview.png`
+- <img width="1316" height="761" alt="powerbi-executive-overview" src="https://github.com/user-attachments/assets/3c5fb2ff-1f33-4643-9379-d2c83d599d0b" />
+
 - `docs/powerbi-customer-segment.png`
+- <img width="1327" height="771" alt="powerbi-customer-segment" src="https://github.com/user-attachments/assets/c2289fdc-6288-4a03-a433-15f280e16495" />
+
 - `docs/powerbi-risk-fraud-decline.png`
+- <img width="1332" height="767" alt="powerbi-risk-fraud-decline" src="https://github.com/user-attachments/assets/0e72b603-2daa-4856-af7f-6d2352d2dcc6" />
+
 - `docs/powerbi-merchant-operations.png`
+- <img width="1325" height="768" alt="powerbi-merchant-operations" src="https://github.com/user-attachments/assets/c4f3926a-f077-4825-89af-0824e3a2d2cd" />
+
 
 ---
 
@@ -347,6 +357,8 @@ This app is showcased through:
 
 Add Streamlit screenshots here only if these files actually exist:
 - `docs/streamlit-home.png`
+- <img width="1896" height="863" alt="streamlit-home" src="https://github.com/user-attachments/assets/82c1d8ec-2739-4d8f-986b-3a90fb1ac1b5" />
+
 - `docs/streamlit-query-input.png`
 - `docs/streamlit-sql-output.png`
 - `docs/streamlit-results.png`
