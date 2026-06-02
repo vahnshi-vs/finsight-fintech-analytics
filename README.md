@@ -359,13 +359,21 @@ This app is showcased through:
 
 ---
 
-## Demo Video
+## Demo Video of Power BI 
 
-A walkthrough video for the project is available here:
+A walkthrough video for the power bi is available here:
 
 [Watch the FinSight demo video](https://www.loom.com/share/5cbcb307638a4ce9aa88fdd5a186f662)
 
 This video is the fastest way to understand the dashboard flow and the project story.
+
+---
+
+## Demo Video of running Streamlit app
+
+This video shows how the FinSight Streamlit AI layer runs from terminal launch to natural-language SQL output.
+
+🔗 [Watch the Loom demo](https://www.loom.com/share/c1e346fb640f40858677304dffaae75e)  
 
 ---
 
