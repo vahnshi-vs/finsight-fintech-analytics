@@ -220,7 +220,6 @@ FinSight uses a star-schema structure to support reporting and analysis.
 ### Star schema diagram
 
 ![FinSight Star Schema](docs/starschemadiagram.png)
-<img width="1344" height="1041" alt="starschemadiagram" src="https://github.com/user-attachments/assets/1d138fbb-f4e1-46f1-a5a2-9ed301c0b372" />
 
 
 ---
