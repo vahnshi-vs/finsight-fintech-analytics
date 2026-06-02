@@ -100,7 +100,6 @@ This project runs in a local analytics environment.
 - AI layer: Streamlit app in `ai-layer/app.py`
 - Natural language model: Google Gemini
 
-This project does **not** use Neon.
 
 ---
 
@@ -185,9 +184,7 @@ flowchart LR
     G --> H
 ```
 
-If you create a dedicated workflow or process image later, place it in `docs/` and link it here.
 
----
 
 ## Star Schema
 
@@ -314,7 +311,6 @@ The Power BI layer was created as a multi-page business reporting solution.
 
 ### Dashboard screenshots
 
-Add your Power BI screenshots here once the image files are saved inside the repository.
 
 Example image file names:
 - `docs/powerbi-executive-overview.png`
@@ -360,7 +356,7 @@ This app is showcased through:
 - screenshots stored in `docs/`
 - video walkthrough support
 
-Add Streamlit screenshots here only if these files actually exist:
+
 - `docs/streamlit-home.png`
 - <img width="1896" height="863" alt="streamlit-home" src="https://github.com/user-attachments/assets/82c1d8ec-2739-4d8f-986b-3a90fb1ac1b5" />
 
