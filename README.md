@@ -357,8 +357,18 @@ This app is showcased through:
 - <img width="1896" height="863" alt="streamlit-home" src="https://github.com/user-attachments/assets/82c1d8ec-2739-4d8f-986b-3a90fb1ac1b5" />
 
 - `docs/streamlit-query-input.png`
+- <img width="1111" height="777" alt="streamlit-query-input" src="https://github.com/user-attachments/assets/d43c75fc-46eb-49f1-80ed-afcce37952e1" />
+
 - `docs/streamlit-sql-output.png`
+-<img width="1100" height="833" alt="streamlit-sql-output" src="https://github.com/user-attachments/assets/1c99c1c5-1afb-4ad9-abca-acc11a1b66b0" />
+
 - `docs/streamlit-results.png`
+- 
+
+Uploading Streamlit running app.mp4…
+
+<img width="533" height="576" alt="streamlit-results" src="https://github.com/user-attachments/assets/455cb375-4c06-49d2-92f1-fdf57a50d14c" />
+
 
 ---
 
